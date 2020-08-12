@@ -44,6 +44,7 @@ namespace WpfApplication1
                      token . ThrowIfCancellationRequested ( );
                         // Готовим ответ. Всего должно 43 байта посылаться в форме массива.
                     byte[] dataSent = new byte [ 43] ;
+
                         // Заполним Fcurrent1 -- это типа частота от прибора, дающего ток.
                     byte[] Fcurrent1 = new byte [ 4 ];
 
@@ -57,10 +58,17 @@ namespace WpfApplication1
                     {
                         dataSent [ i + 1 ] = Fcurrent1 [ i ];
                     }
+
                         //Заполним Power1 -- степень тока
-
                     dataSent [ 9 ] = 8; //1..5*10-8
+                    
+                         //Заполним реактивность №1
+                    byte[] Freactivity1 = new byte[4];
 
+                    for (int i = 0; i < Freactivity1.Length; i++)
+                    {
+                        dataSent[i + 5] = Freactivity1[i];
+                    }
 
                          //Заполним для ворго канала все то же. Канал 1 отошлет от 6 до 9 число 
                     byte[] Fcurrent2 = new byte [ 4 ];
@@ -73,7 +81,13 @@ namespace WpfApplication1
                     }
                         //Заполним Power2
                     dataSent [ 23 ] = 8;
+                    //Заполним реактивность №2
+                    byte[] Freactivity2 = new byte[4];
 
+                    for (int i = 0; i < Freactivity2.Length; i++)
+                    {
+                        dataSent[i + 19] = Freactivity2[i];
+                    }
                         //Послыаем
 
                     handler . Send ( dataSent );
