@@ -25,13 +25,37 @@ namespace WpfApplication1
   {
       private CancellationTokenSource _tokenSourse;
       private Network _network;
-    /// <summary>
-    /// Сокет создавайемый, после принятия данных
-    /// </summary>
-    Socket handler;
+      public DataOnlineBuilder myDataOnBuilder = new DataOnlineBuilder();
+        /// <summary>
+        /// Сокет создавайемый, после принятия данных
+        /// </summary>
+        Socket handler;
+        /// <summary>
+        /// Экземпляр File_Acts
+        /// </summary>
+        File_Acts myFileActs = new File_Acts();
+
+
     public MainWindow()
     {
       InitializeComponent();
+
+
+            //Удалить все параметры. Можно заново загружать файл.
+            myFileActs.Parameters.Clear();
+
+            myFileActs.Read_File("TOKs_prov.txt");
+            //Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
+            //openFileDialog1.Multiselect = true;
+            //if (openFileDialog1.ShowDialog() == true)
+            //{
+            //    //Лист открывающихся файлов
+            //    foreach (var item in openFileDialog1.FileNames)
+            //    {
+            //        //Считываем файлы
+            //        myFileActs.Read_File(item);
+            //    }
+            //}
     }
     
     
@@ -44,24 +68,23 @@ namespace WpfApplication1
             _tokenSourse=new CancellationTokenSource();
             CancellationToken token=_tokenSourse.Token;
 
-                              //Стоим на прослушивании
+            //Начать процесс транслирования файла с реактивностью
+            Task task_1 = Task.Factory.StartNew(() => myDataOnBuilder.DoCurrTok_1( token, 20,myFileActs), token);
+            Task task_2 = Task.Factory.StartNew(() => myDataOnBuilder.DoCurrTok_2(token, 20, myFileActs), token);
+            //Стоим на прослушивании
             //try
             //{
-                string ip=TexBox_IP . Text ;
-                string port=TexBox_port . Text ;
+            string ip=TexBox_IP . Text ;
+            string port=TexBox_port . Text ;
 
-                Task<Socket> task_wait = Task<Socket> . Factory . StartNew ( ( ) => _network . WaitRequest ( ip, port) );
-                handler= await task_wait;
-            //}
-            //catch ( Exception ex )
-            //{
-                //    MessageBox.Show(string . Format ( "ПРоизошла ошибка: {0}" , ex . Message ));
-            //}
+            Task<Socket> task_wait = Task<Socket> . Factory . StartNew ( ( ) => _network . WaitRequest (ip, port),token );
+            handler= await task_wait;
+            
             // Мы дождались клиента, пытающегося с нами соединиться. Получаем ключ -- сообщение. Оно у нас посто одно число "224"
                 try 
 	                {
-                       Task task = Task . Factory . StartNew ( ( ) => _network . BeginBroadcasting ( handler , token ) , token );
-                        await task;
+                       Task task = Task . Factory . StartNew ( ( ) => _network . BeginBroadcasting ( handler , token, myDataOnBuilder, this) , token );
+                        //await task;
 	                }
 	             catch (Exception ex)
 	                {
@@ -69,17 +92,6 @@ namespace WpfApplication1
 	                }
         }
 
-    private void End_Serv_Click(object sender, RoutedEventArgs e)
-    {
-        if ( handler!=null )
-        {
-            _tokenSourse . Cancel ( );
-            handler . Shutdown ( SocketShutdown . Both );
-            handler . Close ( );
-            Start_Serv . IsEnabled=true;
-        }
-        else
-        MessageBox.Show("Закрывать нечего, не было принятых данных");
-   }
+    
   }
 }

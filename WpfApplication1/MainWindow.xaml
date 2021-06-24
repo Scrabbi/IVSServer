@@ -4,7 +4,7 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Button Name="Start_Serv"  Content="Start"  Background="Bisque"  Click="Start_Serv_Click"  VerticalAlignment="Center" Height="40" Margin="0,149,193,131" />
-        <Button Name="End_Serv"  Content="End"  Background="Bisque"  Click="End_Serv_Click" Margin="324,149,0,131"   />
+        
         <StackPanel  Orientation="Vertical">
             <TextBox Text="127.0.0.2"  x:Name="TexBox_IP" Height="30"   />
             <TextBox Text="2040"  x:Name="TexBox_port" Height="30"   />
